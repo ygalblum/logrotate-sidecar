@@ -5,13 +5,12 @@ MAINTAINER Steffen Bleul <sbl@blacklabelops.com>
 ARG LOGROTATE_VERSION=latest
 # permissions
 ARG CONTAINER_UID=1000
-ARG CONTAINER_GID=1000
+ARG CONTAINER_GID=0
 
 # install dev tools
 RUN export CONTAINER_USER=logrotate && \
     export CONTAINER_GROUP=logrotate && \
-    addgroup -g $CONTAINER_GID logrotate && \
-    adduser -u $CONTAINER_UID -G logrotate -h /usr/bin/logrotate.d -s /bin/bash -S logrotate && \
+    adduser -u $CONTAINER_UID -G root -h /usr/bin/logrotate.d -s /bin/bash -S logrotate && \
     apk add --update \
       tar \
       gzip \
@@ -22,6 +21,7 @@ RUN export CONTAINER_USER=logrotate && \
       else apk add "logrotate=${LOGROTATE_VERSION}" ; \
     fi && \
     mkdir -p /usr/bin/logrotate.d && \
+    chmod -R g=u /usr/bin/logrotate.d && \
     wget --no-check-certificate -O /tmp/go-cron.tar.gz https://github.com/michaloo/go-cron/releases/download/v0.0.2/go-cron.tar.gz && \
     tar xvf /tmp/go-cron.tar.gz -C /usr/bin && \
     apk del \
